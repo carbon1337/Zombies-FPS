@@ -119,6 +119,28 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &118728834 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7570596821098026325, guid: 1d0c49871d4e7eb459ab0c13b0759b2c, type: 3}
+  m_PrefabInstance: {fileID: 5406876829882005687}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &118728843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118728834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96170724335171e469c7ffdb2ad7a5eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FootstepSwapper
+  terrainFootstepCollections:
+  - {fileID: 11400000, guid: 60d69f753c6ccca4ba4ad45e66b35117, type: 2}
+  - {fileID: 11400000, guid: 4741781ef52d8f14b8619c5386985b27, type: 2}
+  - {fileID: 11400000, guid: eb9e5b8127b2839489d73a381942ec29, type: 2}
+  - {fileID: 11400000, guid: e05afeb8698062047b6fe54fabcd952c, type: 2}
 --- !u!1 &412449111
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,7 +644,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7570596821098026325, guid: 1d0c49871d4e7eb459ab0c13b0759b2c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 118728843}
   m_SourcePrefab: {fileID: 100100000, guid: 1d0c49871d4e7eb459ab0c13b0759b2c, type: 3}
 --- !u!1001 &8262554437641252270
 PrefabInstance:
