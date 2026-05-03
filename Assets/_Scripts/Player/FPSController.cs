@@ -1,291 +1,379 @@
+/* 
+
+Basic FPS player controller handling movement, camera look,
+crouching, footsteps, and head bob.
+
+*/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(AudioSource))]
 public class FPSController : MonoBehaviour
 {
+    //Input system control scheme and individual actions
+    private PlayerInput playerInput;
+    private InputAction lookAction;
+    private InputAction moveAction;
+    private InputAction sprintAction;
+    private InputAction crouchAction;
+
+    private CharacterController characterController;
+
+    [Header("Camera Settings")]
     private Camera playerCam;
-    public float cameraYOffset = 4f;
+    public float cameraYOffset = 1.5f;
     public float cameraZOffset = 0.8f;
 
-    public float walkSpeed = 6f;
-    public float runMaxSpeed = 12f;
-    public float jumpPower = 7f;
-    private float jumpDamping;
-    public float gravity = 10f;
+    [Range(0f, 0.5f)] public float lookSens = 1f;
+    public float xLookClamp = 75f;
 
-    public float accelSpeed;
-    public float deccelSpeed;
+    private float rotationX = 0f;
+    public bool camIsFrozen = false;
 
-    private float maxJumpStamina = 100f;
-    [SerializeField]
-    public float currentJumpStamina;
-    public float jumpStaminaCooldown = 2f;
+    [Header("Movement Settings")]
+    public float moveSpeed = 5f;
+    public float sprintSpeed = 8f;
+    private float currentSpeed;
+    public float gravity = -9.81f;
 
-    public float lookSens = 2f;
-    public float xLookClamp = 45f;
+    private Vector3 velocity;
 
-    public Vector3 moveDirection = Vector3.zero;
-    float rotationX = 0;
+    [Header("Crouch Settings")]
+    public bool crouchToggle = false;
+    public float standHeight = 1.8f;
+    public float crouchHeight = 1.1f;
+    public float crouchSpeed = 3.5f;
+    public float crouchCamDrop = 0.35f;
+    public float crouchLerpSpeed = 12f;
 
-    public bool canMove = true;
-    public bool isRunning = false;
+    private bool isCrouched = false;
 
-    public CharacterController characterController;
-    Animator animator;
+    [Header("Head Bob Settings")]
+    public bool enableHeadBob = true;
+    public float bobFrequency = 1.2f;
+    public float bobAmplitude = 0.05f;
+    public float bobSmoothing = 10f;
 
-    private bool canPlayLandAudio = true;
-    
-    public List<AudioClip> m_FootstepSounds = new List<AudioClip>();
-    public List<AudioClip> m_jumpVoices = new List<AudioClip>();
-    public List<AudioClip> m_landVoices = new List<AudioClip>();
-    private AudioClip m_jumpSound;
-    private AudioClip m_landSound;
-    private AudioSource m_actionAudioSource;
-    private AudioSource m_voiceAudioSource;
-    private FootstepSwapper swapper;
+    private float bobTimer = 0f;
+    private Vector3 camStandLocalPos;
+    private float currentCamCrouchOffset;
+
+    [Header("Footsteps Audio")]
+    private List<AudioClip> footstepSounds = new List<AudioClip>();
+    private AudioSource actionAudioSource;
+    public float timeBetweenFootsteps = 0.6f;
+    public float timeBetweenFootstepsRunning = 0.35f;
+    public float timeBetweenFootstepsCrouch = 0.8f;
+
+    [Header("Footstep Pitch Variation")]
+    public float footstepPitchMin = 0.95f;
+    public float footstepPitchMax = 1.05f;
+
+    [Header("Footstep Volume")]
+    [Range(0f, 1f)] public float runVolume = 1f;
+    [Range(0f, 1f)] public float walkVolume = 0.6f;
+    [Range(0f, 1f)] public float crouchVolume = 0.2f;
+
     private float timeSinceLastFootstep = 0f;
-    public float timeBetweenFootsteps = 0.6f; // Adjust this value to control the frequency of footsteps
-    private bool wasGrounded;
+    private FootstepSwapper swapper;
 
-    // Start is called before the first frame update
-    void Awake() 
+    [Header("Noise Settings")]
+    public float walkNoiseAmount = 1f;
+    public float runNoiseAmount = 6f;
+
+    private bool isFrozen = false;
+
+    #region Initialization
+    private void Awake()
     {
         playerCam = Camera.main;
-        playerCam.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z + cameraZOffset);
-        playerCam.transform.SetParent(transform);
-        characterController = GetComponent<CharacterController>();
-        // = transform.Find("PlayerBody").GetComponentInChildren<Animator>();
-
-        m_actionAudioSource = GetComponent<AudioSource>();
-        m_voiceAudioSource = GetComponentInChildren<AudioSource>();
-        swapper = GetComponent<FootstepSwapper>();
-        
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        accelSpeed = walkSpeed;
-        currentJumpStamina = maxJumpStamina;
-    }
-
-    public void PlayFootstepsAudio()
-    {
-        swapper.CheckLayers();
-        if (!characterController.isGrounded)
+        if (playerCam != null)
         {
-            return;
+            //Attach camera to player and position it using the configured offsets
+            playerCam.transform.SetParent(transform);
+            playerCam.transform.localPosition = new Vector3(0f, cameraYOffset, cameraZOffset);
+
+            //Store camera position after setup (used for crouch offset)
+            camStandLocalPos = playerCam.transform.localPosition;
+            currentCamCrouchOffset = 0f;
         }
 
-        float currentTimeBetweenFootsteps = timeBetweenFootsteps;
-
-        if(isRunning)
+        if(!isFrozen)
         {
-            currentTimeBetweenFootsteps = 0.35f;
+            //Lock and hide cursor (standard for FPS controls)
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        //Initialize ground layer
+        swapper?.CheckLayers();
+
+        swapper = GetComponent<FootstepSwapper>();
+        
+        //Initialize input, audio, and visual components
+        playerInput = GetComponent<PlayerInput>();
+        characterController = GetComponent<CharacterController>();
+        actionAudioSource = GetComponent<AudioSource>();
+
+        lookAction = playerInput.actions["Look"];
+        moveAction = playerInput.actions["Move"];
+        sprintAction = playerInput.actions["Sprint"];
+        crouchAction = playerInput.actions["Crouch"];
+
+        characterController.height = standHeight;
+        characterController.center = new Vector3(0f, standHeight / 2f, 0f);
+
+    }
+    #endregion
+
+    #region Update Loop
+    private void Update()
+    {
+        if (isFrozen) return;
+
+        //Get movement input and sprint state for movement-related functions
+        Vector2 moveInput = moveAction.ReadValue<Vector2>();
+        bool sprintHeld = sprintAction != null && sprintAction.IsPressed();
+
+        HandleLook();
+        HandleCrouch();
+        HandleMovement(moveInput, sprintHeld);
+        HandleFootsteps(moveInput, sprintHeld);
+        HandleHeadBob(moveInput, sprintHeld);
+    }
+    #endregion
+
+    #region Camera
+    //Used for freezing cam externally
+    public void SetLookState(bool state)
+    {
+        camIsFrozen = state;
+    }
+
+    void HandleLook()
+    {
+        if (playerCam == null || camIsFrozen) return;
+
+        //Get mouse/gamepad look input
+        Vector2 look = lookAction.ReadValue<Vector2>();
+
+        //Apply sensitivity scaling
+        float mouseX = look.x * lookSens;
+        float mouseY = look.y * lookSens;
+
+        rotationX -= mouseY;
+        rotationX = Mathf.Clamp(rotationX, -xLookClamp, xLookClamp);
+
+        playerCam.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
+    }
+
+    void HandleHeadBob(Vector2 moveInput, bool sprintHeld)
+    {
+        if (!enableHeadBob || playerCam == null) return;
+
+        //Determine how strong the movement input is (0–1 range)
+        float inputMag = Mathf.Clamp01(moveInput.magnitude);
+
+        //Head bob only occurs while moving on the ground
+        bool isMoving = inputMag > 0.1f && characterController.isGrounded;
+
+        float bobOffsetY = 0f;
+
+        if (isMoving)
+        {
+            //Freq controls bob speed, amp controls bob intensity
+            float freq = bobFrequency;
+            float amp = bobAmplitude;
+
+            //Adjust bob based on current movement state
+            if (isCrouched) { freq *= 0.9f; amp *= 0.6f; }
+            else if (sprintHeld) { freq *= 2f; amp *= 1.2f; }
+
+            //Advance the sine wave timer
+            bobTimer += Time.deltaTime * freq * (0.5f + inputMag);
+
+            //Generate vertical camera motion using a sine wave
+            bobOffsetY = Mathf.Sin(bobTimer * Mathf.PI * 2f) * amp;
         }
         else
         {
-            currentTimeBetweenFootsteps = timeBetweenFootsteps;
+            //Reset timer when player stops moving
+            bobTimer = 0f;
         }
 
-        // Check if enough time has passed since the last footstep
-        if (Time.time - timeSinceLastFootstep > currentTimeBetweenFootsteps)
+        //Calculate desired camera position
+        Vector3 targetLocalPos = camStandLocalPos + new Vector3(0f, currentCamCrouchOffset + bobOffsetY, 0f);
+
+        //Smoothly interpolate camera toward the target position
+        playerCam.transform.localPosition = Vector3.Lerp(
+            playerCam.transform.localPosition,
+            targetLocalPos,
+            bobSmoothing * Time.deltaTime
+        );
+    }
+    #endregion
+
+    #region Movement
+    void HandleMovement(Vector2 input, bool sprintHeld)
+    {
+        //Convert input into world-space movement
+        Vector3 move = transform.right * input.x + transform.forward * input.y;
+
+        //Only update movement speed while grounded (prevents adding momentum mid-air)
+        if (characterController.isGrounded)
         {
-            int n = Random.Range(1, m_FootstepSounds.Count);
-            m_actionAudioSource.clip = m_FootstepSounds[n];
-            m_actionAudioSource.PlayOneShot(m_actionAudioSource.clip);
+            if (isCrouched)
+                currentSpeed = crouchSpeed;
+            else if (sprintHeld)
+                currentSpeed = sprintSpeed;
+            else
+                currentSpeed = moveSpeed;
+        }
 
-            // Swap the audio clips for variation
-            m_FootstepSounds[n] = m_FootstepSounds[0];
-            m_FootstepSounds[0] = m_actionAudioSource.clip;
+        //Move player using input and previously assigned speed
+        characterController.Move(move * currentSpeed * Time.deltaTime);
 
-            // Update the time of the last footstep
+        //Apply slight downward force to keep the player grounded
+        if (characterController.isGrounded && velocity.y < 0f)
+        {
+            velocity.y = -2f;
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+        characterController.Move(velocity * Time.deltaTime);
+    }
+
+    void HandleCrouch()
+    {
+        if (crouchAction == null) return;
+
+        //Determine whether the player intends to crouch
+        bool desiredCrouch;
+
+        if (!crouchToggle)
+        {
+            //Hold-to-crouch mode
+            desiredCrouch = crouchAction.IsPressed();
+        }
+        else
+        {
+            //Toggle crouch on button press
+            if (crouchAction.WasPressedThisFrame())
+            {
+                isCrouched = !isCrouched;
+            }
+
+            desiredCrouch = isCrouched;
+        }
+
+        isCrouched = desiredCrouch;
+
+        //Determine target collider height
+        float targetHeight = isCrouched ? crouchHeight : standHeight;
+
+        //Current height used as the starting point for the transition
+        float prevHeight = characterController.height;
+
+        //Smoothly transition between crouch and stand
+        float newHeight = Mathf.Lerp(prevHeight, targetHeight, crouchLerpSpeed * Time.deltaTime);
+
+        //Apply new height and reposition controller center so collider remains grounded
+        characterController.height = newHeight;
+        characterController.center = new Vector3(0f, newHeight / 2f, 0f);
+
+        //Offset player to keep feet planted when collider height changes
+        float heightDelta = newHeight - prevHeight;
+        if (Mathf.Abs(heightDelta) > 0.0001f)
+            transform.position += Vector3.up * (heightDelta / 2f);
+
+        //Smoothly move the camera up or down based on crouch state
+        float targetOffset = isCrouched ? -crouchCamDrop : 0f;
+        currentCamCrouchOffset = Mathf.Lerp(currentCamCrouchOffset, targetOffset, crouchLerpSpeed * Time.deltaTime);
+    }
+
+    #endregion
+
+    #region Audio
+    void HandleFootsteps(Vector2 moveInput, bool sprintHeld)
+    {
+        //Check terrain layer under the player to swap correct footstep sounds
+        swapper?.CheckLayers();
+
+        //Prevent footsteps from playing while in the air
+        if (!characterController.isGrounded) return;
+
+        float inputMag = moveInput.magnitude;
+
+        //Ignore very small movement input
+        if (inputMag < 0.1f) return;
+
+        //Ensure there are valid footstep sounds available
+        if (footstepSounds == null || footstepSounds.Count == 0) return;
+
+        //Determine if the player is running (cannot run while crouched)
+        bool isRunning = sprintHeld && !isCrouched;
+
+        //Select time interval between footsteps depending on movement state
+        float interval =
+            isCrouched ? timeBetweenFootstepsCrouch :
+            isRunning ? timeBetweenFootstepsRunning :
+            timeBetweenFootsteps;
+
+        //Only play a footstep if enough time has passed since the last one
+        if (Time.time - timeSinceLastFootstep > interval)
+        {
+            //Randomly select footstep clip
+            int n = Random.Range(0, footstepSounds.Count);
+
+            //Determine volume based on movement state
+            float volume =
+                isCrouched ? crouchVolume :
+                isRunning ? runVolume :
+                walkVolume;
+
+            //Temporarily apply pitch variation to avoid repetitive sounds
+            float oldPitch = actionAudioSource.pitch;
+            actionAudioSource.pitch = Random.Range(footstepPitchMin, footstepPitchMax);
+
+            //Play the selected footstep sound
+            actionAudioSource.PlayOneShot(footstepSounds[n], volume);
+
+            //Restore original pitch and record the footstep time
+            actionAudioSource.pitch = oldPitch;
             timeSinceLastFootstep = Time.time;
         }
     }
 
-    public void PlayJumpAudio()
-    {
-        swapper.CheckLayers();
-
-        m_actionAudioSource.clip = m_jumpSound;
-        m_actionAudioSource.PlayOneShot(m_jumpSound);
-    }
-
-    public void PlayJumpVoicesAudio()
-    {
-        int n = Random.Range(1, m_jumpVoices.Count);
-
-        m_voiceAudioSource.clip = m_jumpVoices[n];
-        m_voiceAudioSource.PlayOneShot(m_voiceAudioSource.clip);
-
-        // Swap the audio clips for variation
-        m_jumpVoices[n] = m_jumpVoices[0];
-        m_jumpVoices[0] = m_voiceAudioSource.clip;
-    }
-
-    public void PlayLandVoicesAudio()
-    {
-        int n = Random.Range(1, m_landVoices.Count);
-
-        m_voiceAudioSource.clip = m_landVoices[n];
-        m_voiceAudioSource.PlayOneShot(m_voiceAudioSource.clip);
-
-        // Swap the audio clips for variation
-        m_landVoices[n] = m_landVoices[0];
-        m_landVoices[0] = m_voiceAudioSource.clip;
-    }
-
-    public void PlayLandAudio()
-    {
-        Debug.Log("Landed");
-        swapper.CheckLayers();
-
-        if(!canPlayLandAudio)
-        {
-            return;
-        }
-
-        m_actionAudioSource.clip = m_landSound;
-        m_actionAudioSource.PlayOneShot(m_landSound);
-        StartCoroutine("LandAudioCooldown");
-
-    }
-
     public void SwapFootsteps(FootstepCollection collection)
     {
-        m_FootstepSounds.Clear();
+        if (collection == null) return;
 
-        for(int i = 0; i < collection.footstepSounds.Count; i++)
+        //Clear the current list of footstep sounds
+        footstepSounds.Clear();
+
+        //Ensure the collection contains valid sounds
+        if (collection.footstepSounds == null) return;
+
+        //Copy sounds from the terrain collection into the active list
+        for (int i = 0; i < collection.footstepSounds.Count; i++)
         {
-            m_FootstepSounds.Add(collection.footstepSounds[i]);
+            footstepSounds.Add(collection.footstepSounds[i]);
         }
-
-        m_jumpSound = collection.jumpSound;
-        m_landSound = collection.landSound;
     }
 
+    #endregion
 
-    void Update()
+    #region Utility
+    public void SetFrozen(bool frozen)
     {
-        // Movement logic
-        Vector3 forward = transform.forward;
-        Vector3 right = transform.right;
-
-        isRunning = Input.GetKey(KeyCode.LeftShift); //Old Input system 1
-
-        if (isRunning && currentJumpStamina > 0f)
-        {
-            if (accelSpeed <= runMaxSpeed)
-            {
-                accelSpeed *= 1.006f;
-            }
-        }
-        if (characterController.isGrounded)
-        {
-            StartCoroutine("ResetStamina");
-
-            if ((!isRunning || currentJumpStamina <= 0f))
-            {
-                accelSpeed = walkSpeed; // Reset acceleration speed to walk speed
-            }
-        }
-
-        if (!wasGrounded && characterController.isGrounded)
-        {
-            PlayLandVoicesAudio();
-            PlayLandAudio();
-        }
-
-        wasGrounded = characterController.isGrounded;
-
-        float inputX = Input.GetAxis("Vertical"); //Old input 2
-        float inputY = Input.GetAxis("Horizontal"); //Old input 3
-
-        //.SetFloat("horizontal", inputY);
-        //.SetFloat("vertical", inputX);
-
-        // Normalize the input vector to ensure consistent speed in all directions
-        Vector2 inputVector = new Vector2(inputX, inputY).normalized;
-
-        float curSpeedX = canMove ? accelSpeed * inputVector.x : 0;
-        float curSpeedY = canMove ? accelSpeed * inputVector.y : 0;
-        float movementDirectionY = moveDirection.y;
-        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
-
-        // Jumping logic
-        jumpDamping = currentJumpStamina / 100;
-
-        if (Input.GetButton("Jump") && canMove && characterController.isGrounded) //Old input 4
-        {
-            if (currentJumpStamina > 0)
-            {
-                PlayJumpVoicesAudio();
-                PlayJumpAudio();
-                StopCoroutine("ResetStamina");
-                SubtractStamina(20f);
-            }
-
-            float currentJumpPower = jumpDamping * jumpPower;
-            moveDirection.y = currentJumpPower;
-        }
-        else
-        {
-            moveDirection.y = movementDirectionY;
-            //.SetBool("isJumping", true);
-        }
-
-        if (!characterController.isGrounded)
-        {
-            moveDirection.y -= gravity * Time.deltaTime;
-        }
-
-                // Call footstep audio method when moving and grounded
-        if (characterController.isGrounded)
-        {
-            //.SetBool("isJumping", false);
-            if(Mathf.Abs(curSpeedX) > 0 || Mathf.Abs(curSpeedY) > 0)
-            {
-                PlayFootstepsAudio();
-            }
-
-        }
-
-        // Rotation logic
-        characterController.Move(moveDirection * Time.deltaTime);
-
-        if (canMove)
-        {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSens; //Old input 5
-            rotationX = Mathf.Clamp(rotationX, -xLookClamp, xLookClamp);
-
-            if (playerCam != null)
-            {
-                playerCam.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            }
-
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSens, 0);
-        }
+        //Used to externally freeze movement
+        isFrozen = frozen;
     }
-
-    private IEnumerator ResetStamina() 
-    {
-        yield return new WaitForSeconds(jumpStaminaCooldown);
-
-        currentJumpStamina = maxJumpStamina;
-        jumpDamping = 1f;
-    }
-
-    private IEnumerator LandAudioCooldown()
-    {
-        canPlayLandAudio = false;
-        yield return new WaitForSeconds(0.2f);
-        canPlayLandAudio = true;
-    }
-
-    private void SubtractStamina(float staminaToSubtract)
-    {
-        currentJumpStamina -= staminaToSubtract;
-    }
+    #endregion
 }
-

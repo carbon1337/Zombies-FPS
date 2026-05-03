@@ -34,7 +34,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70afe9e12c7a7ed47911bb608a23a8ff, type: 3}
   m_Name: SplitToning
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   shadows:
     m_OverrideState: 1
     m_Value: {r: 0.5, g: 0.5, b: 0.5, a: 1}
@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccf1aba9553839d41ae37dd52e9ebcce, type: 3}
   m_Name: MotionBlur
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 0
@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f335fb1ffd8684294ad653bf1c7564, type: 3}
   m_Name: ColorAdjustments
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   postExposure:
     m_OverrideState: 1
     m_Value: 0
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29fa0085f50d5e54f8144f766051a691, type: 3}
   m_Name: FilmGrain
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   type:
     m_OverrideState: 1
     m_Value: 0
@@ -211,7 +211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
   m_Name: Tonemapping
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 0
@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb60a22f311433c4c962b888d1393f88, type: 3}
   m_Name: PaniniProjection
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   distance:
     m_OverrideState: 1
     m_Value: 0
@@ -342,6 +342,9 @@ MonoBehaviour:
   skyOcclusionIntensityMultiplier:
     m_OverrideState: 1
     m_Value: 1
+  worldOffset:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
 --- !u!114 &-1216621516061285780
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -354,7 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   skipIterations:
     m_OverrideState: 1
     m_Value: 1
@@ -374,6 +377,9 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: {r: 1, g: 1, b: 1, a: 1}
   highQualityFiltering:
+    m_OverrideState: 1
+    m_Value: 0
+  filter:
     m_OverrideState: 1
     m_Value: 0
   downscale:
@@ -401,7 +407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 221518ef91623a7438a71fef23660601, type: 3}
   m_Name: WhiteBalance
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   temperature:
     m_OverrideState: 1
     m_Value: 0
@@ -462,8 +468,165 @@ MonoBehaviour:
   - {fileID: -6288072647309666549}
   - {fileID: 7518938298396184218}
   - {fileID: -1410297666881709256}
-  - {fileID: -7750755424749557576}
-  - {fileID: -5139089513906902183}
+  - {fileID: 1424705313863492940}
+  - {fileID: 255875017839697747}
+--- !u!114 &255875017839697747
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24a169137338a2f47986f6bc8e00dfe8, type: 3}
+  m_Name: CRTSettings
+  m_EditorClassIdentifier: ColbyO.VNTG::ColbyO.VNTG.CRT.CRTSettings
+  active: 1
+  Enabled:
+    m_OverrideState: 1
+    m_Value: 0
+  ShowInSceneView:
+    m_OverrideState: 1
+    m_Value: 0
+  ScreenResolution:
+    m_OverrideState: 1
+    m_Value: {x: 1920, y: 1080}
+  RefreshRate:
+    m_OverrideState: 1
+    m_Value: 49
+  DecayRate:
+    m_OverrideState: 1
+    m_Value: 0.9
+  EnableInterlacedRendering:
+    m_OverrideState: 1
+    m_Value: 1
+  EnableScreenBend:
+    m_OverrideState: 1
+    m_Value: 1
+  ScreenBend:
+    m_OverrideState: 1
+    m_Value: 7
+  ScreenRoundness:
+    m_OverrideState: 1
+    m_Value: 0.201
+  VignetteOpacity:
+    m_OverrideState: 1
+    m_Value: 0.925
+  ScanLineVerticalOpacity:
+    m_OverrideState: 1
+    m_Value: 0
+  ScanLineHorizontalOpacity:
+    m_OverrideState: 1
+    m_Value: 0
+  ScanLineVerticalSpeed:
+    m_OverrideState: 1
+    m_Value: 0.1
+  ScanLineHorizontalSpeed:
+    m_OverrideState: 1
+    m_Value: -0.2
+  ScanLineStrength:
+    m_OverrideState: 1
+    m_Value: 0.2
+  NoiseScale:
+    m_OverrideState: 1
+    m_Value: 1
+  NoiseRBGOffsetX:
+    m_OverrideState: 1
+    m_Value: 0.4
+  NoiseRBGOffsetY:
+    m_OverrideState: 1
+    m_Value: 0.7
+  NoiseSpeed:
+    m_OverrideState: 1
+    m_Value: 0.1
+  NoiseFade:
+    m_OverrideState: 1
+    m_Value: 0.55
+  VhsSmear:
+    m_OverrideState: 1
+    m_Value: 0.95
+  EnableTrackerLine:
+    m_OverrideState: 1
+    m_Value: 0
+  TrackingSpeed:
+    m_OverrideState: 1
+    m_Value: 4
+  TrackingJitter:
+    m_OverrideState: 1
+    m_Value: 4
+  GlitchChance:
+    m_OverrideState: 1
+    m_Value: 0.2
+  GlitchLength:
+    m_OverrideState: 1
+    m_Value: 15
+  EnableSignalInterference:
+    m_OverrideState: 1
+    m_Value: 1
+  InterferenceFrequency:
+    m_OverrideState: 1
+    m_Value: 70
+  InterferenceAmplitude:
+    m_OverrideState: 1
+    m_Value: 0.082
+  ChromaticOffset:
+    m_OverrideState: 0
+    m_Value: 0
+  ChromaticOffsetSpeed:
+    m_OverrideState: 0
+    m_Value: 0.1
+  SubPixelMode:
+    m_OverrideState: 0
+    m_Value: 0
+  SubPixelDensity:
+    m_OverrideState: 0
+    m_Value: 100
+  UnsharpAmount:
+    m_OverrideState: 1
+    m_Value: 0.94
+  UnsharpRadius:
+    m_OverrideState: 1
+    m_Value: 1
+  UnsharpThreshold:
+    m_OverrideState: 1
+    m_Value: 0.02
+  ClampBlack:
+    m_OverrideState: 1
+    m_Value: 0
+  ClampWhite:
+    m_OverrideState: 1
+    m_Value: 1
+  ShadowTint:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  Gamma:
+    m_OverrideState: 1
+    m_Value: 0.482
+  Brightness:
+    m_OverrideState: 1
+    m_Value: 0.5
+  Contrast:
+    m_OverrideState: 1
+    m_Value: 0.489
+  Saturation:
+    m_OverrideState: 1
+    m_Value: 0.5
+  Hue:
+    m_OverrideState: 1
+    m_Value: 0
+  RedShift:
+    m_OverrideState: 1
+    m_Value: 0
+  BlueShift:
+    m_OverrideState: 1
+    m_Value: 0
+  GreenShift:
+    m_OverrideState: 1
+    m_Value: 0
+  IsMonochrome:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -565,6 +728,70 @@ MonoBehaviour:
   highlightsEnd:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &1424705313863492940
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dbed17f5f145d64589ad7ae3c637fc3, type: 3}
+  m_Name: PSXEffectSettings
+  m_EditorClassIdentifier: ColbyO.VNTG::ColbyO.VNTG.PSX.PSXEffectSettings
+  active: 1
+  Enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  ShowInSceneView:
+    m_OverrideState: 1
+    m_Value: 0
+  PixelResolution:
+    m_OverrideState: 1
+    m_Value: {x: 512, y: 512}
+  ColorPrecision:
+    m_OverrideState: 1
+    m_Value: 159
+  EnableDither:
+    m_OverrideState: 1
+    m_Value: 1
+  DitherMode:
+    m_OverrideState: 1
+    m_Value: 2
+  DitherPattern:
+    m_OverrideState: 1
+    m_Value: 3
+  DitherPixelPerfect:
+    m_OverrideState: 1
+    m_Value: 0
+  DitherScale:
+    m_OverrideState: 1
+    m_Value: 0.142
+  DitherThreshold:
+    m_OverrideState: 1
+    m_Value: 0.081
+  EnableFog:
+    m_OverrideState: 1
+    m_Value: 1
+  FogColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.13095807, g: 0.117524035, b: 0.1792453, a: 1}
+  FogDensity:
+    m_OverrideState: 1
+    m_Value: 0.041
+  FogNoiseStrength:
+    m_OverrideState: 1
+    m_Value: 0.1
+  FogEdgeSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.5
+  FogNoiseScale:
+    m_OverrideState: 1
+    m_Value: 0.5
+  FogNoiseStart:
+    m_OverrideState: 1
+    m_Value: 0.7
 --- !u!114 &1666464333004379222
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -577,7 +804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eb4b772797da9440885e8bd939e9560, type: 3}
   m_Name: ColorCurves
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   master:
     m_OverrideState: 1
     m_Value:
@@ -786,7 +1013,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c01700fd266d6914ababb731e09af2eb, type: 3}
   m_Name: DepthOfField
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 0
@@ -848,7 +1075,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180773991d8724ab7f2d216912b564, type: 3}
   m_Name: ChromaticAberration
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   intensity:
     m_OverrideState: 1
     m_Value: 0
@@ -886,13 +1113,13 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.388
   smoothness:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.173
   rounded:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
 --- !u!114 &7518938298396184218
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -933,7 +1160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdfbdbb87d3286943a057f7791b43141, type: 3}
   m_Name: ChannelMixer
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   redOutRedIn:
     m_OverrideState: 1
     m_Value: 100
