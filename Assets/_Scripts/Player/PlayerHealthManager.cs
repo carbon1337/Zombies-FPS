@@ -64,12 +64,6 @@ public class PlayerHealthManager : MonoBehaviour
         HandleHealthClamp();
         HandleHealingCooldown();
         UpdateHealthDisplay();
-
-        //Temporary damage test input
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            TakeDamage(20f);
-        }
     }
     #endregion
 

@@ -32,7 +32,7 @@ public class InteractDoor : MonoBehaviour, IInteractable
 
         if(isInteractable)
         {
-            interactCanvas.alpha = 1 - (distance/maxDistance);
+            //interactCanvas.alpha = 1 - (distance/maxDistance);
         }
     }
 

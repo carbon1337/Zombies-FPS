@@ -10,7 +10,8 @@ public class EnemyManager : MonoBehaviour
 
     public float attackRange = 4.5f;
     public float attackDamage = 10;
-
+    
+    [SerializeField]
     private float minSpeed = 1f, maxSpeed = 3f;
     private Transform groundCheck;
     private Transform attackPoint;
@@ -48,7 +49,7 @@ public class EnemyManager : MonoBehaviour
         moveSpeed = Random.Range(minSpeed, maxSpeed);
         agent.speed = moveSpeed;
 
-        animator.SetFloat("Velocity", moveSpeed);
+        animator.SetFloat("Velocity", moveSpeed - minSpeed);
     }
 
     public void MoveTowardsPlayer()
