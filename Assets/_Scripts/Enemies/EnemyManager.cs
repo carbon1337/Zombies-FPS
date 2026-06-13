@@ -128,9 +128,12 @@ public class EnemyManager : MonoBehaviour
 
     public void PlayAttackAudio()
     {
+        if (attackSounds.Count == 0) return;
+
         int i = Random.Range(0, attackSounds.Count);
         AudioClip currentClip = attackSounds[i];
-        vocalAudioSource.clip = currentClip;
+
+        vocalAudioSource.pitch = Random.Range(0.75f, 1.35f);
 
         vocalAudioSource.PlayOneShot(currentClip);
     }

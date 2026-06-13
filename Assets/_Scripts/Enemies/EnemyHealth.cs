@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : MonoBehaviour, IDamageable
 {
-    public int enemyHealth;
+    public float enemyHealth;
 
     // Start is called before the first frame update
     void Start()
@@ -20,7 +20,7 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         enemyHealth -= damage;
         GameManager.Instance.SpendMoney(-20);

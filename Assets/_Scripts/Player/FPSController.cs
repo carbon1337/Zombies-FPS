@@ -126,7 +126,7 @@ public class FPSController : MonoBehaviour
         crouchAction = playerInput.actions["Crouch"];
 
         characterController.height = standHeight;
-        characterController.center = new Vector3(0f, standHeight / 2f, 0f);
+        characterController.center = new Vector3(0f, 0f, 0f);
 
     }
     #endregion
@@ -283,9 +283,9 @@ public class FPSController : MonoBehaviour
         //Smoothly transition between crouch and stand
         float newHeight = Mathf.Lerp(prevHeight, targetHeight, crouchLerpSpeed * Time.deltaTime);
 
-        //Apply new height and reposition controller center so collider remains grounded
+        //Apply new height while keeping the controller centered on the player object
         characterController.height = newHeight;
-        characterController.center = new Vector3(0f, newHeight / 2f, 0f);
+        characterController.center = Vector3.zero;
 
         //Offset player to keep feet planted when collider height changes
         float heightDelta = newHeight - prevHeight;
