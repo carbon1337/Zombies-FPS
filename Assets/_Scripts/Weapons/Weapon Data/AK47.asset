@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abf7c308985dd5a4b8edfc8c4c732b40, type: 3}
   m_Name: AK47
   m_EditorClassIdentifier: Assembly-CSharp::GunData
-  gunName: 
+  gunName: AK-47
   damage: 25
   range: 100
   fireRate: 0.15
   magazineSize: 8
   maxReserveAmmo: 80
   reloadTime: 1.5
-  shootSound: {fileID: 0}
-  reloadSound: {fileID: 0}
-  muzzleFlashPrefab: {fileID: 0}
-  hitEffectPrefab: {fileID: 0}
+  shootSound: {fileID: 8300000, guid: f644ba651407af845817041b6636b7ff, type: 3}
+  reloadSound: {fileID: 8300000, guid: e93b1f2862cf15a4cb3c9c124c2b4d85, type: 3}
+  muzzleFlashPrefab: {fileID: 100006, guid: 234e5aa95353f0643b0181dc3872cda9, type: 3}
+  hitEffectPrefab: {fileID: 100002, guid: f75efcef4bb42054abf94f8e5c701adc, type: 3}

@@ -23,7 +23,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         enemyHealth -= damage;
-        GameManager.Instance.SpendMoney(-20);
+        //GameManager.Instance.SpendMoney(-20);
 
         Debug.Log(enemyHealth);
     }

@@ -13,6 +13,7 @@ public class GunController : MonoBehaviour
     private int reserveAmmo;
     private float nextFireTime;
     private bool isReloading;
+    private bool isShooting;
 
     private void Start()
     {
@@ -22,11 +23,30 @@ public class GunController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("Fire1"))
+        if (isShooting)
             TryShoot();
+    }
 
-        if (Input.GetKeyDown(KeyCode.R))
-            TryReload();
+    public void SetShooting(bool shooting)
+    {
+        isShooting = shooting;
+    }
+
+    public void Reload()
+    {
+        TryReload();
+    }
+
+    public void Equip()
+    {
+        gameObject.SetActive(true);
+        isShooting = false;
+    }
+
+    public void Unequip()
+    {
+        isShooting = false;
+        gameObject.SetActive(false);
     }
 
     private void TryShoot()
@@ -51,7 +71,9 @@ public class GunController : MonoBehaviour
 
     private void Shoot()
     {
-        if (gunData.shootSound != null)
+        Debug.Log("Shot fired. Ammo left: " + currentAmmo);
+
+        if (gunData.shootSound != null && audioSource != null)
             audioSource.PlayOneShot(gunData.shootSound);
 
         if (gunData.muzzleFlashPrefab != null && muzzlePoint != null)
@@ -61,11 +83,26 @@ public class GunController : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
         {
-            if (hit.collider.TryGetComponent(out IDamageable damageable))
+            Debug.Log("Hit: " + hit.collider.name);
+
+            IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+
+            if (damageable != null)
+            {
                 damageable.TakeDamage(gunData.damage);
+                Debug.Log("Damage dealt: " + gunData.damage);
+            }
+            else
+            {
+                Debug.LogWarning("Hit object does not have IDamageable on itself or parent.");
+            }
 
             if (gunData.hitEffectPrefab != null)
                 Instantiate(gunData.hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+        }
+        else
+        {
+            Debug.Log("Shot missed.");
         }
     }
 
@@ -86,8 +123,9 @@ public class GunController : MonoBehaviour
     private IEnumerator ReloadRoutine()
     {
         isReloading = true;
+        isShooting = false;
 
-        if (gunData.reloadSound != null)
+        if (gunData.reloadSound != null && audioSource != null)
             audioSource.PlayOneShot(gunData.reloadSound);
 
         yield return new WaitForSeconds(gunData.reloadTime);
