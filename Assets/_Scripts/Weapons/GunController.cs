@@ -23,13 +23,24 @@ public class GunController : MonoBehaviour
 
     private void Update()
     {
-        if (isShooting)
-            TryShoot();
+        if (!isShooting)
+            return;
+
+        if (gunData.fireMode != FireMode.FullAuto)
+            return;
+
+        TryShoot();
     }
 
     public void SetShooting(bool shooting)
     {
         isShooting = shooting;
+
+        if (!shooting)
+            return;
+
+        if (gunData.fireMode == FireMode.SemiAuto)
+            TryShoot();
     }
 
     public void Reload()
@@ -77,7 +88,10 @@ public class GunController : MonoBehaviour
             audioSource.PlayOneShot(gunData.shootSound);
 
         if (gunData.muzzleFlashPrefab != null && muzzlePoint != null)
-            Instantiate(gunData.muzzleFlashPrefab, muzzlePoint.position, muzzlePoint.rotation);
+        {
+            GameObject flash = Instantiate(gunData.muzzleFlashPrefab, muzzlePoint.position, muzzlePoint.rotation);
+            Destroy(flash, 1f);
+        }
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
@@ -98,7 +112,10 @@ public class GunController : MonoBehaviour
             }
 
             if (gunData.hitEffectPrefab != null)
-                Instantiate(gunData.hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+            {
+                GameObject hitEffect = Instantiate(gunData.hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+                Destroy(hitEffect, 2f);
+            }
         }
         else
         {

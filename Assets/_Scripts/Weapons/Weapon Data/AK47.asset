@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: AK47
   m_EditorClassIdentifier: Assembly-CSharp::GunData
   gunName: AK-47
+  fireMode: 1
   damage: 25
   range: 100
-  fireRate: 0.15
-  magazineSize: 8
+  fireRate: 0.13
+  magazineSize: 30
   maxReserveAmmo: 80
   reloadTime: 1.5
   shootSound: {fileID: 8300000, guid: f644ba651407af845817041b6636b7ff, type: 3}

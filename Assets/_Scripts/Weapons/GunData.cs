@@ -6,6 +6,9 @@ public class GunData : ScriptableObject
     [Header("Info")]
     public string gunName;
 
+    [Header("Fire Mode")]
+    public FireMode fireMode;
+
     [Header("Damage")]
     public float damage = 25f;
     public float range = 100f;
