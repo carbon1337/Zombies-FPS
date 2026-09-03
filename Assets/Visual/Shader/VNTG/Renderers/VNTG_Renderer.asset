@@ -56,7 +56,7 @@ MonoBehaviour:
   m_DepthAttachmentFormat: 0
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
-  m_IntermediateTextureMode: 1
+  m_IntermediateTextureMode: 0
 --- !u!114 &4068382821419771254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,7 +71,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: PSXShader::PSXShader.CRTRendererFeature
   m_Active: 1
   _shader: {fileID: 4800000, guid: 22c8e59f6a328e04f81d588008473cb8, type: 3}
-  _injectionPoint: 550
+  _injectionPoint: 600
 --- !u!114 &5075489610307778329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Name: PSXEffectFeature
   m_EditorClassIdentifier: PSXShader::PSXShader.PSXEffectFeature
   m_Active: 1
-  _renderEvent: 550
+  _renderEvent: 600
 --- !u!114 &7704927588454551938
 MonoBehaviour:
   m_ObjectHideFlags: 0

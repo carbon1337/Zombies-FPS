@@ -22,7 +22,8 @@ public class FPSController : MonoBehaviour
     private InputAction sprintAction;
     private InputAction crouchAction;
 
-    private CharacterController characterController;
+    [HideInInspector]
+    public CharacterController characterController;
 
     [Header("Camera Settings")]
     private Camera playerCam;
@@ -38,7 +39,9 @@ public class FPSController : MonoBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float sprintSpeed = 8f;
-    private float currentSpeed;
+    
+    [HideInInspector]
+    public float currentSpeed;
     public float gravity = -9.81f;
 
     private Vector3 velocity;
@@ -54,6 +57,8 @@ public class FPSController : MonoBehaviour
     private bool isCrouched = false;
 
     [Header("Head Bob Settings")]
+    public bool isMoving = false;
+
     public bool enableHeadBob = true;
     public float bobFrequency = 1.2f;
     public float bobAmplitude = 0.05f;
@@ -181,7 +186,7 @@ public class FPSController : MonoBehaviour
         float inputMag = Mathf.Clamp01(moveInput.magnitude);
 
         //Head bob only occurs while moving on the ground
-        bool isMoving = inputMag > 0.1f && characterController.isGrounded;
+        isMoving = inputMag > 0.1f && characterController.isGrounded;
 
         float bobOffsetY = 0f;
 

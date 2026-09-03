@@ -19,7 +19,7 @@ MonoBehaviour:
   fireRate: 0.13
   magazineSize: 30
   maxReserveAmmo: 80
-  reloadTime: 1.5
+  reloadTime: 2.8
   shootSound: {fileID: 8300000, guid: f644ba651407af845817041b6636b7ff, type: 3}
   reloadSound: {fileID: 8300000, guid: e93b1f2862cf15a4cb3c9c124c2b4d85, type: 3}
   muzzleFlashPrefab: {fileID: 100006, guid: 234e5aa95353f0643b0181dc3872cda9, type: 3}

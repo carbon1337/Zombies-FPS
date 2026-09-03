@@ -15,14 +15,28 @@ public class GunController : MonoBehaviour
     private bool isReloading;
     private bool isShooting;
 
+    public FPSController playerController;
+
+    public Animator animator;
+
+    //anim speed variables for running and walking
+    float velocity = 0.0f;
+    public float acceleration = .08f;
+    public float decceleration = .08f;
+    int velocityHash;
+
     private void Start()
     {
         currentAmmo = gunData.magazineSize;
         reserveAmmo = gunData.maxReserveAmmo;
+
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
+        HandleAnimation();
+
         if (!isShooting)
             return;
 
@@ -30,10 +44,49 @@ public class GunController : MonoBehaviour
             return;
 
         TryShoot();
+
+    }
+
+
+    public void HandleAnimation()
+    {
+        //Movement
+        if (playerController.isMoving)
+        {
+            animator.SetBool("isMoving", true);
+        }  else
+        {
+            animator.SetBool("isMoving", false);
+        }
+
+        //Running vs Walking
+
+        float minVelocity = 0f;
+        float maxVelocity = 1f;
+        if(velocity < 1 && playerController.currentSpeed > playerController.moveSpeed)
+        {
+            velocity += Time.deltaTime * acceleration;
+            velocity = Mathf.Clamp(velocity, minVelocity, maxVelocity);
+        }
+        else {
+            velocity -= Time.deltaTime * decceleration;
+            velocity = Mathf.Clamp(velocity, minVelocity, maxVelocity);
+        }
+        animator.SetFloat("velocity", velocity); 
+
+        if(isShooting)
+        {
+            animator.SetTrigger("isShooting");
+        }
     }
 
     public void SetShooting(bool shooting)
     {
+        if(isReloading)
+        {
+            return;
+        }
+        
         isShooting = shooting;
 
         if (!shooting)
@@ -141,6 +194,8 @@ public class GunController : MonoBehaviour
     {
         isReloading = true;
         isShooting = false;
+
+        animator.SetTrigger("Reload");
 
         if (gunData.reloadSound != null && audioSource != null)
             audioSource.PlayOneShot(gunData.reloadSound);
